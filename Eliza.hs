@@ -1,6 +1,6 @@
-import Chatterbot
+--import Chatterbot
 
-main = chatterbot "Eliza" eliza
+--main = chatterbot "Eliza" eliza
 
 eliza = [
   ("",
@@ -243,3 +243,20 @@ fix f x
 -- Take an element from a list indexed by a fraction of the list length
 pick :: RealFrac r => r -> [a] -> a
 pick u xs = xs !! (floor.(u*).fromIntegral.length) xs
+
+substitute :: Eq a => a -> [a] -> [a] -> [a]
+substitute _ [] _ = []
+substitute wildcard (t:ts) s
+  | wildcard == t       = s ++ substitute wildcard ts s
+  | otherwise           = t:substitute wildcard ts s
+
+match :: Eq a => a -> [a] -> [a] -> Maybe [a]
+match _ [] []           = Just []
+match _ [] (s:ss)       = Nothing
+match _ (p:ps) []       = Nothing
+match wildcard (p:ps) (s:ss)
+  | wildcard /= p       = if p == p then match wildcard ps ss else Nothing
+  | otherwise           singleWildcardMatch `orElse` longerWildcardMatch
+
+singleWildcardMatch :: Eq a => a -> [a] -> [a] -> Maybe [a]
+longerWildcardMatch :: Eq a => a -> [a] -> [a] -> Maybe [a]
