@@ -1,4 +1,5 @@
 --import Chatterbot
+import Data.Maybe
 
 --main = chatterbot "Eliza" eliza
 
@@ -254,9 +255,11 @@ match :: Eq a => a -> [a] -> [a] -> Maybe [a]
 match _ [] []           = Just []
 match _ [] (s:ss)       = Nothing
 match _ (p:ps) []       = Nothing
-match wildcard (p:ps) (s:ss)
-  | wildcard /= p       = if p == p then match wildcard ps ss else Nothing
-  | otherwise           singleWildcardMatch `orElse` longerWildcardMatch
+match wc (p:ps) (s:ss)
+  | wc /= p             = if p == s then match wc ps ss else Nothing
+  | otherwise           = singleWildcardMatch wc (p:ps) (s:ss) `orElse` longerWildcardMatch wc (p:ps) (s:ss)
 
 singleWildcardMatch :: Eq a => a -> [a] -> [a] -> Maybe [a]
+singleWildcardMatch wc (p:ps) (s:ss) = if isJust match wc ps ss then Just [s] else Nothing
 longerWildcardMatch :: Eq a => a -> [a] -> [a] -> Maybe [a]
+longerWildcardMatch wc (p:ps) (s:ss) = mmap ((:) s) (match wc (p:ps) ss)
