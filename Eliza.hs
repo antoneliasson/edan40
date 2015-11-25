@@ -260,6 +260,6 @@ match wc (p:ps) (s:ss)
   | otherwise           = singleWildcardMatch wc (p:ps) (s:ss) `orElse` longerWildcardMatch wc (p:ps) (s:ss)
 
 singleWildcardMatch :: Eq a => a -> [a] -> [a] -> Maybe [a]
-singleWildcardMatch wc (p:ps) (s:ss) = if isJust match wc ps ss then Just [s] else Nothing
+singleWildcardMatch wc (p:ps) (s:ss) = if isJust (match wc ps ss) then Just [s] else Nothing
 longerWildcardMatch :: Eq a => a -> [a] -> [a] -> Maybe [a]
 longerWildcardMatch wc (p:ps) (s:ss) = mmap ((:) s) (match wc (p:ps) ss)
