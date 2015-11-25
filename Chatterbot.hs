@@ -124,7 +124,7 @@ match wc (p:ps) (s:ss)
 
 
 -- Helper function to match
-singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
+singleWildcardMatch, longerWildcardMatch :: Eq a => a -> [a] -> [a] -> Maybe [a]
 singleWildcardMatch wc (p:ps) (s:ss) = if isJust (match wc ps ss) then Just [s] else Nothing
 longerWildcardMatch wc (p:ps) (s:ss) = mmap ((:) s) (match wc (p:ps) ss)
 
