@@ -2,6 +2,7 @@ module Chatterbot where
 import Utilities
 import System.Random
 import Data.Char
+import Data.Maybe
 
 chatterbot :: String -> [(String, [String])] -> IO ()
 chatterbot botName botRules = do
@@ -105,23 +106,27 @@ reductionsApply _ = id
 
 -- Replaces a wildcard in a list with the list given as the third argument
 substitute :: Eq a => a -> [a] -> [a] -> [a]
-substitute _ _ _ = []
-{- TO BE WRITTEN -}
+substitute _ [] _ = []
+substitute wildcard (t:ts) s
+  | wildcard == t       = s ++ substitute wildcard ts s
+  | otherwise           = t:substitute wildcard ts s
 
 
 -- Tries to match two lists. If they match, the result consists of the sublist
 -- bound to the wildcard in the pattern list.
 match :: Eq a => a -> [a] -> [a] -> Maybe [a]
-match _ _ _ = Nothing
-{- TO BE WRITTEN -}
+match _ [] []           = Just []
+match _ [] (s:ss)       = Nothing
+match _ (p:ps) []       = Nothing
+match wc (p:ps) (s:ss)
+  | wc /= p             = if p == s then match wc ps ss else Nothing
+  | otherwise           = singleWildcardMatch wc (p:ps) (s:ss) `orElse` longerWildcardMatch wc (p:ps) (s:ss)
 
 
 -- Helper function to match
 singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
-singleWildcardMatch (wc:ps) (x:xs) = Nothing
-{- TO BE WRITTEN -}
-longerWildcardMatch (wc:ps) (x:xs) = Nothing
-{- TO BE WRITTEN -}
+singleWildcardMatch wc (p:ps) (s:ss) = if isJust (match wc ps ss) then Just [s] else Nothing
+longerWildcardMatch wc (p:ps) (s:ss) = mmap ((:) s) (match wc (p:ps) ss)
 
 
 
