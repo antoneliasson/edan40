@@ -35,8 +35,7 @@ rulesApply :: [PhrasePair] -> Phrase -> Phrase
 rulesApply _ = id
 
 reflect :: Phrase -> Phrase
-{- TO BE WRITTEN -}
-reflect = id
+reflect = map (try (\x -> lookup x reflections))
 
 reflections =
   [ ("am",     "are"),
