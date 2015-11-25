@@ -155,7 +155,5 @@ transformationApply wc f l p = mmap (substitute wc (snd p)) (mmap f (match wc (f
 
 -- Applying a list of patterns until one succeeds
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
-transformationsApply _ _ _ _ = Nothing
-{- TO BE WRITTEN -}
-
-
+transformationsApply _ _ [] _ = Nothing
+transformationsApply wc f (p:ps) l = transformationApply wc f l p `orElse` transformationsApply wc f ps l
