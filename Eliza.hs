@@ -7,7 +7,7 @@ eliza = [
       ["Speak up! I can't hear you."]),
 
   ("I need *",
-      ["Why do you need *?",
+      ["Why do you need * ?",
        "Would it really help you to get * ?",
        "Are you sure you need * ?"]),
 
