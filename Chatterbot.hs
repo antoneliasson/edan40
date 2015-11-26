@@ -29,7 +29,7 @@ type BotBrain = [(Phrase, [Phrase])]
 stateOfMind :: BotBrain -> IO (Phrase -> Phrase)
 stateOfMind brain = do
   r <- randomIO :: IO Float
-  return (\x -> fromJust $ lookup x (makeList r brain))
+  return (rulesApply (makeList r brain))
   where
     makeList :: Float -> BotBrain -> [PhrasePair]
     makeList r brain = map (\(q, as) -> (q, pick r as)) brain
@@ -72,7 +72,6 @@ prepare :: String -> Phrase
 prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|") 
 
 rulesCompile :: [(String, [String])] -> BotBrain
---rulesCompile rules = map2 (words, map words) rules
 rulesCompile rules = map (map2 (words, map words)) rules
 
 --------------------------------------
