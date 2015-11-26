@@ -1,6 +1,6 @@
 module Utilities where
 
--- Simultaneous map of two functions over two objects
+-- Simultaneous map of two functions over the two parts of a tuple
 map2 :: (a -> b, c -> d) -> (a, c) -> (b, d)
 map2 (f1, f2) (x1, x2) = (f1 x1, f2 x2)
 
