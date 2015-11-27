@@ -97,28 +97,15 @@ reduce = fix (reductionsApply reductions)
 
 matches :: Phrase -> Phrase -> Maybe Phrase 
 matches q input = match "*" q input
-substituted :: Phrase -> Phrase -> Phrase -> Phrase
-substituted q a input = maybe input (substitute "*" a) (matches q input)
-substd2 :: Phrase -> PhrasePair -> Maybe Phrase
-substd2 input (q, a) = fmap (substitute "*" a) (matches q input)
-
-untuplesubstitute :: PhrasePair -> Phrase -> Phrase
-untuplesubstitute pp = substituted (fst pp) (snd pp)
+substituted :: Phrase -> PhrasePair -> Maybe Phrase
+substituted input (q, a) = fmap (substitute "*" a) (matches q input)
 
 reductionsApply :: [PhrasePair] -> Phrase -> Phrase
---reductionsApply _ = id
 reductionsApply pairs phrase
   | length reduced == 0 = phrase
   | otherwise = reduced !! 0
   where
-    reduced = (mapMaybe (substd2 phrase) pairs)
-
-  --map (\(q, a) -> (substituted q a phrase)) pairs
-
-    
-
---reductionsApply pairs phrase = map (\(q, a) -> maybe phrase (substitute "*" a) (match "*" q phrase)) pairs
- --{- try -} map (match ) pairs
+    reduced = (mapMaybe (substituted phrase) pairs)
 
 
 -------------------------------------------------------
