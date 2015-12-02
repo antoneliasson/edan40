@@ -27,3 +27,22 @@ similarityScore (x:xs) (y:ys) =
         score x y
             | x == y    = scoreMatch
             | otherwise = scoreMismatch
+
+-- 2b.
+
+-- For every tuple in the list in the third argument: Prepend the first
+-- argument to the list in the first part of the tuple, and prepend the second
+-- argument to the list in the second part of the tuple.
+attachHeads :: a -> a -> [([a],[a])] -> [([a],[a])]
+attachHeads h1 h2 aList = [(h1:xs,h2:ys) | (xs,ys) <- aList]
+
+-- 2c.
+
+maximaBy :: Ord b => (a -> b) -> [a] -> [a]
+maximaBy _ [] = error "max of empty list"
+maximaBy f [x] = [x]
+maximaBy f (x:xs)
+    | current == GT     = [x]
+    | current == EQ     = x:maximaBy f xs
+    | otherwise         = maximaBy f xs
+    where current = compare (f x) (f (head xs))
