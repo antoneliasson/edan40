@@ -19,11 +19,10 @@ similarityScore [] [] = 0
 similarityScore (x:xs) [] = scoreSpace + similarityScore xs []
 similarityScore [] (y:ys) = scoreSpace + similarityScore [] ys
 similarityScore (x:xs) (y:ys) =
-    max3 (similarityScore xs ys + score x y)
-         (similarityScore xs (y:ys) + scoreSpace)
-         (similarityScore (x:xs) ys + scoreSpace)
+    maximum [similarityScore xs ys + score x y,
+        similarityScore xs (y:ys) + scoreSpace,
+        similarityScore (x:xs) ys + scoreSpace]
     where
-        max3 x y = max $ max x y
         score x y
             | x == y    = scoreMatch
             | otherwise = scoreMismatch
