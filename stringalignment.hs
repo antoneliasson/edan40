@@ -7,7 +7,7 @@ module Main where
 --    MCS
 
 scoreMatch = 0 :: Int
-scoreMismatch = -1 :: Int
+scoreMismatch = -2 :: Int
 scoreSpace = -1 :: Int
 string1 = "writers"
 string2 = "vintner"
@@ -45,3 +45,19 @@ maximaBy f (x:xs)
     | current == EQ     = x:maximaBy f xs
     | otherwise         = maximaBy f xs
     where current = compare (f x) (f (head xs))
+
+-- 2d.
+
+type AlignmentType = (String, String)
+
+optAlignments :: String -> String -> [AlignmentType]
+optAlignments [] [] = [([],[])]
+optAlignments (x:xs) [] = attachHeads x '-' $ optAlignments xs []
+optAlignments [] (y:ys) = attachHeads '-' y $ optAlignments [] ys
+optAlignments (x:xs) (y:ys) =
+    concat $ maximaBy cmpAlignments [attachHeads x y $ optAlignments xs ys,
+        attachHeads x '-' $ optAlignments xs (y:ys),
+        attachHeads '-' y $ optAlignments (x:xs) ys]
+    where
+        cmpAlignments :: [AlignmentType] -> Int
+        cmpAlignments ((x1, x2):xs) = similarityScore x1 x2
