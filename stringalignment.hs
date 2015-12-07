@@ -49,9 +49,17 @@ optAlignments [] [] = [([],[])]
 optAlignments (x:xs) [] = attachHeads x '-' $ optAlignments xs []
 optAlignments [] (y:ys) = attachHeads '-' y $ optAlignments [] ys
 optAlignments (x:xs) (y:ys) =
-    concat $ maximaBy cmpAlignments [attachHeads x y $ optAlignments xs ys,
-        attachHeads x '-' $ optAlignments xs (y:ys),
-        attachHeads '-' y $ optAlignments (x:xs) ys]
+    maximaBy score $ concat [attachHeads x y (optAlignments xs ys),
+        attachHeads '-' y (optAlignments (x:xs) ys),
+        attachHeads x '-' (optAlignments xs (y:ys))]
     where
-        cmpAlignments :: [AlignmentType] -> Int
-        cmpAlignments ((x1, x2):xs) = similarityScore x1 x2
+    score :: AlignmentType -> Int
+    score ([], []) = 0
+    score (x:xs, y:ys) =
+        sc x y + score (xs, ys)
+        where
+        sc x y
+            | x == y = scoreMatch
+            | x == '-' = scoreSpace
+            | y == '-' = scoreSpace
+            | otherwise = scoreMismatch
