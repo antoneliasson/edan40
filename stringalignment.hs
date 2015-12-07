@@ -63,3 +63,11 @@ optAlignments (x:xs) (y:ys) =
             | x == '-' = scoreSpace
             | y == '-' = scoreSpace
             | otherwise = scoreMismatch
+
+outputOptAlignments :: String -> String -> IO ()
+outputOptAlignments s1 s2 = do
+    let as = optAlignments s1 s2
+    putStrLn ("There are " ++ (show $ length as) ++ " optimal alignments:\n")
+    putStrLn $ format as
+    where
+        format as = foldl1 (++) (map (\(x,y) -> x ++ "\n" ++ y ++ "\n\n") as)
