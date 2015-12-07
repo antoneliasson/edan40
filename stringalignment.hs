@@ -64,6 +64,8 @@ optAlignments (x:xs) (y:ys) =
             | y == '-' = scoreSpace
             | otherwise = scoreMismatch
 
+-- 2e.
+
 outputOptAlignments :: String -> String -> IO ()
 outputOptAlignments s1 s2 = do
     let as = optAlignments s1 s2
