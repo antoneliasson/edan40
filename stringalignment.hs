@@ -7,7 +7,7 @@ module Main where
 --    MCS
 
 scoreMatch = 0 :: Int
-scoreMismatch = -2 :: Int
+scoreMismatch = -1 :: Int
 scoreSpace = -1 :: Int
 string1 = "writers"
 string2 = "vintner"
@@ -38,13 +38,7 @@ attachHeads h1 h2 aList = [(h1:xs,h2:ys) | (xs,ys) <- aList]
 -- 2c.
 
 maximaBy :: Ord b => (a -> b) -> [a] -> [a]
-maximaBy _ [] = error "max of empty list"
-maximaBy f [x] = [x]
-maximaBy f (x:xs)
-    | current == GT     = [x]
-    | current == EQ     = x:maximaBy f xs
-    | otherwise         = maximaBy f xs
-    where current = compare (f x) (f (head xs))
+maximaBy f xs = [x | x <- xs, (maximum (map f xs)) == (f x)]
 
 -- 2d.
 
