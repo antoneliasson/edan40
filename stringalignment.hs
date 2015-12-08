@@ -76,7 +76,7 @@ outputOptAlignments s1 s2 = do
 
 -- 3.
 
-fastSimilarityScore :: Eq a => [a] -> [a] -> Int
+fastSimilarityScore :: String -> String -> Int
 fastSimilarityScore xs ys = simScore (length xs) (length ys)
   where
     simScore i j = simTable!!i!!j
