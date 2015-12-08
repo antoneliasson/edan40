@@ -73,3 +73,26 @@ outputOptAlignments s1 s2 = do
     putStrLn $ format as
     where
         format as = foldl1 (++) (map (\(x,y) -> x ++ "\n" ++ y ++ "\n\n") as)
+
+-- 3.
+
+fastSimilarityScore :: Eq a => [a] -> [a] -> Int
+fastSimilarityScore xs ys = simScore (length xs) (length ys)
+  where
+    simScore i j = simTable!!i!!j
+    simTable :: [[Int]]
+    simTable = [[ simEntry i j | j<-[0..]] | i<-[0..] ]
+
+    simEntry :: Int -> Int -> Int
+    simEntry i 0 = i*scoreSpace
+    simEntry 0 j = j*scoreSpace
+    simEntry i j =
+        maximum [simScore (i-1) (j-1) + score x y,
+            simScore (i-1) (j) + scoreSpace,
+            simScore i (j-1) + scoreSpace]
+      where
+         x = xs!!(i-1)
+         y = ys!!(j-1)
+         score x y
+            | x == y    = scoreMatch
+            | otherwise = scoreMismatch
