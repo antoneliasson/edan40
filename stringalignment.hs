@@ -111,24 +111,16 @@ fastOptAlignments xs ys = snd $ optAlign (length xs) (length ys)
     optEntry 0 0 = (0, [([],[])])
     optEntry i 0 = (scoreSpace + fst (optEntry (i-1) 0), attachTails (xs!!(i-1)) '-' $ snd (optEntry (i-1) 0))
     optEntry 0 j = (scoreSpace + fst (optEntry 0 (j-1)), attachTails '-' (ys!!(j-1)) $ snd (optEntry 0 (j-1)))
---    optEntry i j = (maxScore, maxAligns)
     optEntry i j = (fst (max!!0), concat $ map snd max)
         where
         max = maximaBy fst [diag, right, down]
-{-        maxScore = 0
-        --maxAligns = []
-        maxAligns = maximaBy score $ concat [
-            attachTails x y $ snd (optEntry (i-1) (j-1)),
-            attachTails '-' y $ snd (optEntry i (j-1)),
-            attachTails x '-' $ snd (optEntry (i-1) j)
-            ]-}
             where
             diag, right, down :: (Int, [AlignmentType])
             diag
-                | x == y = addScoreAndTails scoreMatch x y (optEntry (i-1) (j-1))
-                | otherwise = addScoreAndTails scoreMismatch x y (optEntry (i-1) (j-1))
-            right = addScoreAndTails scoreSpace '-' y (optEntry i (j-1))
-            down = addScoreAndTails scoreSpace x '-' (optEntry (i-1) j)
+                | x == y = addScoreAndTails scoreMatch x y (optAlign (i-1) (j-1))
+                | otherwise = addScoreAndTails scoreMismatch x y (optAlign (i-1) (j-1))
+            right = addScoreAndTails scoreSpace '-' y (optAlign i (j-1))
+            down = addScoreAndTails scoreSpace x '-' (optAlign (i-1) j)
             x = xs!!(i-1)
             y = ys!!(j-1)
 
