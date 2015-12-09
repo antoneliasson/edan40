@@ -111,35 +111,26 @@ fastOptAlignments xs ys = snd $ optAlign (length xs) (length ys)
     optEntry 0 0 = (0, [([],[])])
     optEntry i 0 = (scoreSpace + fst (optEntry (i-1) 0), attachTails (xs!!(i-1)) '-' $ snd (optEntry (i-1) 0))
     optEntry 0 j = (scoreSpace + fst (optEntry 0 (j-1)), attachTails '-' (ys!!(j-1)) $ snd (optEntry 0 (j-1)))
-    optEntry i j = (maxScore, maxAligns)
+--    optEntry i j = (maxScore, maxAligns)
+    optEntry i j = (fst (max!!0), concat $ map snd max)
         where
-        maxScore = 0
+        max = maximaBy fst [diag, right, down]
+{-        maxScore = 0
         --maxAligns = []
         maxAligns = maximaBy score $ concat [
             attachTails x y $ snd (optEntry (i-1) (j-1)),
             attachTails '-' y $ snd (optEntry i (j-1)),
             attachTails x '-' $ snd (optEntry (i-1) j)
-            ]
+            ]-}
             where
+            diag, right, down :: (Int, [AlignmentType])
+            diag
+                | x == y = addScoreAndTails scoreMatch x y (optEntry (i-1) (j-1))
+                | otherwise = addScoreAndTails scoreMismatch x y (optEntry (i-1) (j-1))
+            right = addScoreAndTails scoreSpace '-' y (optEntry i (j-1))
+            down = addScoreAndTails scoreSpace x '-' (optEntry (i-1) j)
             x = xs!!(i-1)
             y = ys!!(j-1)
 
-            score :: AlignmentType -> Int
-            score ([], []) = 0
-            score (x:xs, y:ys) =
-                sc x y + score (xs, ys)
-                where
-                sc x y
-                    | x == y = scoreMatch
-                    | x == '-' = scoreSpace
-                    | y == '-' = scoreSpace
-                    | otherwise = scoreMismatch
-
-{-fastOptAlignments [] [] = [([],[])]
-fastOptAlignments (x:xs) [] = attachHeads x '-' $ fastOptAlignments xs []
-fastOptAlignments [] (y:ys) = attachHeads '-' y $ fastOptAlignments [] ys
-fastOptAlignments (x:xs) (y:ys) =
-    maximaBy score $ concat [attachHeads x y (fastOptAlignments xs ys),
-        attachHeads '-' y (fastOptAlignments (x:xs) ys),
-        attachHeads x '-' (fastOptAlignments xs (y:ys))]
-    where-}
+            addScoreAndTails :: Int -> Char -> Char -> (Int, [AlignmentType]) -> (Int, [AlignmentType])
+            addScoreAndTails sc a b (score, as) = (score + sc, attachTails a b as)
