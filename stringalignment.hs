@@ -96,3 +96,15 @@ fastSimilarityScore xs ys = simScore (length xs) (length ys)
          score x y
             | x == y    = scoreMatch
             | otherwise = scoreMismatch
+
+fastOptAlignments :: String -> String -> [AlignmentType]
+fastOptAlignments xs ys = snd $ optAlign (length xs) (length ys)
+    where
+    optAlign i j = optTable!!i!!j
+    optTable :: [[(Int, [AlignmentType])]]
+    optTable = [[ optEntry i j | j<-[0..]] | i<-[0..]]
+
+    optEntry :: Int -> Int -> (Int, [AlignmentType])
+    optEntry 0 0 = (0, [([],[])])
+    optEntry i 0 = (scoreSpace + fst (optEntry (i-1) 0), attachHeads (xs!!(length xs - i)) '-' $ snd (optEntry (i-1) 0))
+    optEntry 0 j = (scoreSpace + fst (optEntry 0 (j-1)), attachHeads '-' (ys!!(length ys - j)) $ snd (optEntry 0 (j-1)))
