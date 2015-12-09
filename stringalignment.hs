@@ -64,7 +64,7 @@ optAlignments (x:xs) (y:ys) =
             | y == '-' = scoreSpace
             | otherwise = scoreMismatch
 
--- 2e.
+-- 2e (using the slow algorithm).
 
 outputOptAlignments :: String -> String -> IO ()
 outputOptAlignments s1 s2 = do
@@ -111,13 +111,13 @@ fastOptAlignments xs ys = snd $ optAlign (length xs) (length ys)
     optEntry 0 0 = (0, [([],[])])
     optEntry i 0 = (scoreSpace + fst (optEntry (i-1) 0), attachTails (xs!!(i-1)) '-' $ snd (optEntry (i-1) 0))
     optEntry 0 j = (scoreSpace + fst (optEntry 0 (j-1)), attachTails '-' (ys!!(j-1)) $ snd (optEntry 0 (j-1)))
-    optEntry i j = (fst (max!!0), concat $ map snd max)
+    optEntry i j = (fst (best!!0), concat $ map snd best)
         where
-        max = maximaBy fst [diag, right, down]
+        best = maximaBy fst [diag, right, down]
             where
             diag, right, down :: (Int, [AlignmentType])
             diag
-                | x == y = addScoreAndTails scoreMatch x y (optAlign (i-1) (j-1))
+                | x == y    = addScoreAndTails scoreMatch x y (optAlign (i-1) (j-1))
                 | otherwise = addScoreAndTails scoreMismatch x y (optAlign (i-1) (j-1))
             right = addScoreAndTails scoreSpace '-' y (optAlign i (j-1))
             down = addScoreAndTails scoreSpace x '-' (optAlign (i-1) j)
@@ -126,3 +126,13 @@ fastOptAlignments xs ys = snd $ optAlign (length xs) (length ys)
 
             addScoreAndTails :: Int -> Char -> Char -> (Int, [AlignmentType]) -> (Int, [AlignmentType])
             addScoreAndTails sc a b (score, as) = (score + sc, attachTails a b as)
+
+-- Output function using the fast algorithm
+
+fastOutputOptAlignments :: String -> String -> IO ()
+fastOutputOptAlignments s1 s2 = do
+    let as = fastOptAlignments s1 s2
+    putStrLn ("There are " ++ (show $ length as) ++ " optimal alignments:\n")
+    putStrLn $ format as
+    where
+        format as = foldl1 (++) (map (\(x,y) -> x ++ "\n" ++ y ++ "\n\n") as)
