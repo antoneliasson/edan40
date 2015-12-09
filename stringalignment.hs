@@ -97,6 +97,9 @@ fastSimilarityScore xs ys = simScore (length xs) (length ys)
             | x == y    = scoreMatch
             | otherwise = scoreMismatch
 
+attachTails :: a -> a -> [([a],[a])] -> [([a],[a])]
+attachTails t1 t2 aList = [(xs ++ [t1], ys ++ [t2]) | (xs, ys) <- aList]
+
 fastOptAlignments :: String -> String -> [AlignmentType]
 fastOptAlignments xs ys = snd $ optAlign (length xs) (length ys)
     where
@@ -106,5 +109,37 @@ fastOptAlignments xs ys = snd $ optAlign (length xs) (length ys)
 
     optEntry :: Int -> Int -> (Int, [AlignmentType])
     optEntry 0 0 = (0, [([],[])])
-    optEntry i 0 = (scoreSpace + fst (optEntry (i-1) 0), attachHeads (xs!!(length xs - i)) '-' $ snd (optEntry (i-1) 0))
-    optEntry 0 j = (scoreSpace + fst (optEntry 0 (j-1)), attachHeads '-' (ys!!(length ys - j)) $ snd (optEntry 0 (j-1)))
+    optEntry i 0 = (scoreSpace + fst (optEntry (i-1) 0), attachTails (xs!!(i-1)) '-' $ snd (optEntry (i-1) 0))
+    optEntry 0 j = (scoreSpace + fst (optEntry 0 (j-1)), attachTails '-' (ys!!(j-1)) $ snd (optEntry 0 (j-1)))
+    optEntry i j = (maxScore, maxAligns)
+        where
+        maxScore = 0
+        --maxAligns = []
+        maxAligns = maximaBy score $ concat [
+            attachTails x y $ snd (optEntry (i-1) (j-1)),
+            attachTails '-' y $ snd (optEntry i (j-1)),
+            attachTails x '-' $ snd (optEntry (i-1) j)
+            ]
+            where
+            x = xs!!(i-1)
+            y = ys!!(j-1)
+
+            score :: AlignmentType -> Int
+            score ([], []) = 0
+            score (x:xs, y:ys) =
+                sc x y + score (xs, ys)
+                where
+                sc x y
+                    | x == y = scoreMatch
+                    | x == '-' = scoreSpace
+                    | y == '-' = scoreSpace
+                    | otherwise = scoreMismatch
+
+{-fastOptAlignments [] [] = [([],[])]
+fastOptAlignments (x:xs) [] = attachHeads x '-' $ fastOptAlignments xs []
+fastOptAlignments [] (y:ys) = attachHeads '-' y $ fastOptAlignments [] ys
+fastOptAlignments (x:xs) (y:ys) =
+    maximaBy score $ concat [attachHeads x y (fastOptAlignments xs ys),
+        attachHeads '-' y (fastOptAlignments (x:xs) ys),
+        attachHeads x '-' (fastOptAlignments xs (y:ys))]
+    where-}
