@@ -57,15 +57,26 @@ exec (Write expr : stmts) dict input =
     Expr.value expr dict : exec stmts dict input
 instance Parse Statement where
   parse = statement
-  toString = toString'
+  toString = toString' 0
 
-toString' :: Statement -> String
-toString' (Assignment var expr) = var ++ ":=" ++ toString expr ++ ";\n"
-toString' Skip = "skip;\n"
-toString' (Block block) = "begin\n" ++ concat (map toString' block) ++ "end\n"
-toString' (If cond th el) = "if " ++ Expr.toString cond ++ " then\n"
-    ++ toString' th ++ "else\n" ++ toString' el
-toString' (While cond body) = "while " ++ Expr.toString cond ++ " do\n"
-    ++ toString' body
-toString' (Read var) = "read " ++ var ++ ";\n"
-toString' (Write expr) = "write " ++ Expr.toString expr ++ ";\n"
+-- one indentation level is this many spaces
+tabsize = 4
+
+toString' :: Int -> Statement -> String
+toString' indent (Assignment var expr) =
+    replicate indent ' ' ++ var ++ ":=" ++ toString expr ++ ";\n"
+toString' indent Skip = replicate indent ' ' ++ "skip;\n"
+toString' indent (Block block) =
+    replicate indent ' ' ++ "begin\n"
+    ++ concat (map (toString' (indent+tabsize)) block)
+    ++ replicate indent ' ' ++ "end\n"
+toString' indent (If cond th el) =
+    replicate indent ' ' ++ "if " ++ Expr.toString cond ++ " then\n"
+    ++ toString' (indent+tabsize) th ++ replicate indent ' '
+    ++ "else\n" ++ toString' (indent+tabsize) el
+toString' indent (While cond body) =
+    replicate indent ' ' ++ "while " ++ Expr.toString cond ++ " do\n"
+    ++ toString' (indent+tabsize) body
+toString' indent (Read var) = replicate indent ' ' ++ "read " ++ var ++ ";\n"
+toString' indent (Write expr) =
+    replicate indent ' ' ++ "write " ++ Expr.toString expr ++ ";\n"
