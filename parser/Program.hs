@@ -3,13 +3,14 @@ import Parser hiding (T)
 import qualified Statement
 import qualified Dictionary
 import Prelude hiding (return, fail)
-newtype T = Program [Statement.T]
+newtype T = Program [Statement.T] deriving Show
 
 statements = iter Statement.parse >-> buildStatements
+buildStatements :: [Statement.T] -> T
 buildStatements = Program
 
 instance Parse T where
   parse = statements
   toString = error "Program.toString not implemented"
 
-exec = error "Program.exec not implemented"
+exec (Program stmts) = Statement.exec stmts Dictionary.empty
