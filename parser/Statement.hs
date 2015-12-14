@@ -29,7 +29,7 @@ buildIf (cond, (th, el)) = If cond th el
 while = accept "while" -# Expr.parse #- require "do" # statement >-> buildWhile
 buildWhile (e, s) = While e s
 
-read = accept "read" #- word #- require ";" >-> buildRead
+read = accept "read" -# word #- require ";" >-> buildRead
 buildRead v = Read v
 
 write = accept "write" -# Expr.parse #- require ";" >-> buildWrite
