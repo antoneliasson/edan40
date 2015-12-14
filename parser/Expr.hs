@@ -70,8 +70,14 @@ shw prec (Sub t u) = parens (prec>5) (shw 5 t ++ "-" ++ shw 6 u)
 shw prec (Mul t u) = parens (prec>6) (shw 6 t ++ "*" ++ shw 6 u)
 shw prec (Div t u) = parens (prec>6) (shw 6 t ++ "/" ++ shw 7 u)
 
+-- Stolen from Data.Prelude
+fromJust          :: String -> Maybe a -> a
+fromJust e Nothing = error e
+fromJust _ (Just x) = x
+
 value :: Expr -> Dictionary.T String Integer -> Integer
-value (Num n) _ = error "value not implemented"
+value (Num n) _ = n
+value (Var s) d = fromJust ("unknown variable " ++ s) $ Dictionary.lookup s d
 
 instance Parse Expr where
     parse = expr
