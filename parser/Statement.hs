@@ -24,7 +24,7 @@ block = accept "begin" -# iter statement #- require "end" >-> buildBlock
 buildBlock ss = Block ss
 
 if_ = accept "if" -# Expr.parse #- require "then" # (statement #- require "else" # statement) >-> buildIf
-buildIf (ex, (th, el)) = If ex th el
+buildIf (cond, (th, el)) = If cond th el
 
 while = accept "while" -# Expr.parse #- require "do" # statement >-> buildWhile
 buildWhile (e, s) = While e s
