@@ -38,11 +38,23 @@ buildWrite v = Write v
 statement = assignment ! skip ! block ! if_ ! while ! read ! write
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
-exec (If cond thenStmts elseStmts: stmts) dict input = 
-    if (Expr.value cond dict)>0 
-    then exec (thenStmts: stmts) dict input
-    else exec (elseStmts: stmts) dict input
-
+exec [] _ _ = []
+exec (Assignment var expr : stmts) dict input =
+    exec stmts (Dictionary.insert (var, Expr.value expr dict) dict) input
+exec (Skip : stmts) dict input = exec stmts dict input
+exec (Block block : stmts) dict input = exec (block++stmts) dict input
+exec (If cond thenStmts elseStmts : stmts) dict input =
+    if (Expr.value cond dict)>0
+        then exec (thenStmts : stmts) dict input
+        else exec (elseStmts : stmts) dict input
+exec loop@(While cond body : after) dict input =
+    if (Expr.value cond dict)>0
+        then exec (body : loop) dict input
+        else exec after dict input
+exec (Read var : stmts) dict (input:rest) =
+    exec stmts (Dictionary.insert (var, input) dict) rest
+exec (Write expr : stmts) dict input =
+    Expr.value expr dict : exec stmts dict input
 instance Parse Statement where
   parse = statement
   toString = error "Statement.toString not implemented"
