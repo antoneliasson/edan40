@@ -44,5 +44,5 @@ exec (If cond thenStmts elseStmts: stmts) dict input =
     else exec (elseStmts: stmts) dict input
 
 instance Parse Statement where
-  parse = error "Statement.parse not implemented"
+  parse = statement
   toString = error "Statement.toString not implemented"
