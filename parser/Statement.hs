@@ -35,6 +35,7 @@ buildRead v = Read v
 write = accept "write" -# Expr.parse #- require ";" >-> buildWrite
 buildWrite v = Write v
 
+statement :: Parser Statement
 statement = assignment ! skip ! block ! if_ ! while ! read ! write
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
@@ -55,6 +56,7 @@ exec (Read var : stmts) dict (input:rest) =
     exec stmts (Dictionary.insert (var, input) dict) rest
 exec (Write expr : stmts) dict input =
     Expr.value expr dict : exec stmts dict input
+
 instance Parse Statement where
   parse = statement
   toString = toString' 0
