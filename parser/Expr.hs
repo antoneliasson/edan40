@@ -77,7 +77,11 @@ fromJust _ (Just x) = x
 
 value :: Expr -> Dictionary.T String Integer -> Integer
 value (Num n) _ = n
-value (Var s) d = fromJust ("unknown variable " ++ s) $ Dictionary.lookup s d
+value (Var s) d = fromJust ("undefined variable " ++ s) $ Dictionary.lookup s d
+value (Add x y) d = value x d + value y d
+value (Sub x y) d = value x d - value y d
+value (Mul x y) d = value x d * value y d
+value (Div x y) d = div (value x d) (value y d)
 
 instance Parse Expr where
     parse = expr
