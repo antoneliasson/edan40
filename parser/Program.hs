@@ -11,6 +11,7 @@ buildStatements = Program
 
 instance Parse T where
   parse = statements
-  toString = error "Program.toString not implemented"
+  toString = toString'
 
 exec (Program stmts) = Statement.exec stmts Dictionary.empty
+toString' (Program stmts) = concat $ map Statement.toString stmts
