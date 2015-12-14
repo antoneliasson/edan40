@@ -57,4 +57,15 @@ exec (Write expr : stmts) dict input =
     Expr.value expr dict : exec stmts dict input
 instance Parse Statement where
   parse = statement
-  toString = error "Statement.toString not implemented"
+  toString = toString'
+
+toString' :: Statement -> String
+toString' (Assignment var expr) = var ++ ":=" ++ toString expr ++ ";\n"
+toString' Skip = "skip;\n"
+toString' (Block block) = "begin\n" ++ concat (map toString' block) ++ "end\n"
+toString' (If cond th el) = "if " ++ Expr.toString cond ++ " then\n"
+    ++ toString' th ++ "else\n" ++ toString' el
+toString' (While cond body) = "while " ++ Expr.toString cond ++ " do\n"
+    ++ toString' body
+toString' (Read var) = "read " ++ var ++ ";\n"
+toString' (Write expr) = "write " ++ Expr.toString expr ++ ";\n"
