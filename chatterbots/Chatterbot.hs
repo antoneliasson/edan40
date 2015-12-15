@@ -35,7 +35,7 @@ stateOfMind brain = do
     makeList r brain = map (\(q, as) -> (q, pick r as)) brain
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
-rulesApply pairs phrase = fromMaybe [] $ transformationsApply "*" reflect pairs phrase
+rulesApply pairs = fromMaybe [] . transformationsApply "*" reflect pairs
 
 reflect :: Phrase -> Phrase
 reflect = map (try (\x -> lookup x reflections))
@@ -72,7 +72,7 @@ prepare :: String -> Phrase
 prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|") 
 
 rulesCompile :: [(String, [String])] -> BotBrain
-rulesCompile rules = map (map2 (words . (map toLower), map (words))) rules
+rulesCompile = map (map2 (words . map toLower, map words))
 
 --------------------------------------
 
