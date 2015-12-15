@@ -38,7 +38,7 @@ rulesApply :: [PhrasePair] -> Phrase -> Phrase
 rulesApply = (.) (fromMaybe []) . transformationsApply "*" reflect
 
 reflect :: Phrase -> Phrase
-reflect = map (try (\x -> lookup x reflections))
+reflect = map $ try $ flip lookup reflections
 
 reflections =
   [ ("am",     "are"),
@@ -133,8 +133,10 @@ match wc (p:ps) (s:ss)
 
 -- Helper function to match
 singleWildcardMatch, longerWildcardMatch :: Eq a => a -> [a] -> [a] -> Maybe [a]
-singleWildcardMatch wc (p:ps) (s:ss) = if isJust (match wc ps ss) then Just [s] else Nothing
-longerWildcardMatch wc (p:ps) (s:ss) = mmap ((:) s) (match wc (p:ps) ss)
+singleWildcardMatch wc (p:ps) (s:ss) =
+  maybe Nothing (const (Just [s])) (match wc ps ss)
+longerWildcardMatch wc (p:ps) (s:ss) =
+  mmap ((:) s) (match wc (p:ps) ss)
 
 
 
@@ -158,10 +160,10 @@ matchCheck = matchTest == Just testSubstitutions
 
 -- Applying a single pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
-transformationApply wc f l p = mmap (substitute wc (snd p)) (mmap f (match wc (fst p) l))
+transformationApply wc f l p = mmap (substitute wc (snd p) . f) (match wc (fst p) l)
+
 
 
 -- Applying a list of patterns until one succeeds
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
-transformationsApply _ _ [] _ = Nothing
-transformationsApply wc f (p:ps) l = transformationApply wc f l p `orElse` transformationsApply wc f ps l
+transformationsApply wc f ps l = foldr1 orElse $ map (transformationApply wc f l) ps
