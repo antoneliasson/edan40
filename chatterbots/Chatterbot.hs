@@ -35,7 +35,7 @@ stateOfMind brain = do
     makeList r brain = map (\(q, as) -> (q, pick r as)) brain
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
-rulesApply pairs = fromMaybe [] . transformationsApply "*" reflect pairs
+rulesApply = (.) (fromMaybe []) . transformationsApply "*" reflect
 
 reflect :: Phrase -> Phrase
 reflect = map (try (\x -> lookup x reflections))
