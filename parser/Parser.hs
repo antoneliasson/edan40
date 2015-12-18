@@ -17,10 +17,10 @@ iter m = m # iter m >-> cons ! return []
 cons(a, b) = a:b
 
 (-#) :: Parser a -> Parser b -> Parser b
-(m -# n) cs = fmap (\x -> ((snd.fst) x, snd x)) ((m # n) cs)
+(m -# n) cs = (m # n >-> snd) cs
 
 (#-) :: Parser a -> Parser b -> Parser a
-(m #- n) cs = fmap (\x -> ((fst.fst) x, snd x)) ((m # n) cs)
+(m #- n) cs = (m # n >-> fst) cs
 
 spaces :: Parser String
 spaces = iter (char ? isSpace)
